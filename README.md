@@ -1,38 +1,38 @@
-# IR_Search_Engine
-A Search engine built using Elasticsearch and python with a basic UI using Flask
+# Search Engine
 
-python version - 3.7.7
+A Search engine built using ElasticSearch and Python
 
-Elasticsearch version used - 7.7.1 (Warning:- If using an elasticsearch version < 7.0 might have to change indexing and mappings 
-to include doc_types and type declerations)
+## Development Environment
 
-Flask version - Upgrade to 1.0 or higher if using a container(docker, kubernetes, etc.)
+* MacOS 11.0.1
+* ElasticSearch 7.10.1
+* JVM 15.0.1
+* Python 3.9.0
+* pip 20.3.3
+* ElasticSearch Python client: https://elasticsearch-py.readthedocs.io/en/master
 
-Dataset used for indexing is included inside searchapp/sinhala_songs_corpus.json
+## Set up
 
-# Instructions for the setup
-1. Clone or download the repository (Linux/Unix OS is preferred)
-2. Create a virtual environment to run the project. Activate the environment (using virtualenv)
+1. Install Elastic Search: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/brew.html
+
+2. Create and activate a virtual environment to run the project.
 	```
-	python3 -m venv venv
+	python -m venv venv
 	source venv/bin/activate
 	```
 3. Install necessary python requirements
 	```
 	pip install -r requirements.txt
 	```
-	(If you had trouble with getting the "Sinling" dependancy from the git repository, Add it manually from https://github.com/ysenarath/sinling)
-4. setup searchapp
+4. Start ElasticSearch
 	```
-	pip install -e .
+	elasticsearch
 	```
+	It runs on http://localhost:9200/
 5. While elasticsearch node/nodes are running, create indices in nodes.
-	```
-	python searchapp/index_songs.py
-	```
 6. Run the flask app.
 	```
-	python searchapp/run.py
+	python3 searchapp/run.py
 	```
 7. Goto http://localhost:5000 to view the flask app and do searches.
 
