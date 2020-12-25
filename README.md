@@ -9,12 +9,15 @@ A Search engine built using ElasticSearch and Python
 * JVM 15.0.1
 * Python 3.9.0
 * pip 20.3.3
+
+## Requirements
+
 * ElasticSearch Python client: https://elasticsearch-py.readthedocs.io/en/master
+* pandas 1.1.5
 
 ## Set up
 
 1. Install Elastic Search: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/brew.html
-
 2. Create and activate a virtual environment to run the project.
 	```
 	python -m venv venv
@@ -22,17 +25,14 @@ A Search engine built using ElasticSearch and Python
 	```
 3. Install necessary python requirements
 	```
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 	```
 4. Start ElasticSearch
 	```
 	elasticsearch
 	```
 	It runs on http://localhost:9200/
-5. While elasticsearch node/nodes are running, create indices in nodes.
-6. Run the flask app.
+5. Run the search app
 	```
-	python3 searchapp/run.py
+	python main.py
 	```
-7. Goto http://localhost:5000 to view the flask app and do searches.
-
