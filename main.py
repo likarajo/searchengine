@@ -5,7 +5,7 @@ from search import Search
 s = Search(index_name='netflix')
 
 '''Index data'''
-s.start_indexing()
+s.index_data()
 
 '''Obtain user input'''
 keywords = input("Enter search keywords: ")

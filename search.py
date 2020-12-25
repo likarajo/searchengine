@@ -1,16 +1,18 @@
 import pandas as pd
-import elasticsearch
 from elasticsearch import Elasticsearch
+
 class Search:
     def __init__(self, index_name):
         self.index = index_name
         self.initialize()
         self.top_results = []
-        self.df = self.read_and_preprocess()
+        self.df = self.preprocess()
     
     def initialize(self):
-        '''initializes elasticsearch interface with python & creates index of passed name
-           returns True if online
+        '''
+        initializes elasticsearch interface
+        creates index
+        returns True if online
         '''
         self.es = Elasticsearch(hosts='http://localhost:9200')
         if self.es.indices.exists(self.index):
@@ -18,9 +20,11 @@ class Search:
         self.es.indices.create(self.index)
         return self.es.ping()
         
-    def read_and_preprocess(self, path_to_df='netflix_titles.csv'):
-        '''reads & drops na columns from dataset, converts into records
-           returns df
+    def preprocess(self, path_to_df='netflix_titles.csv'):
+        '''
+        reads & drops na columns from dataset
+        converts into records
+        returns dataframe
         '''
         df = pd.read_csv(path_to_df)
         df = df.dropna()
@@ -28,8 +32,8 @@ class Search:
         return df
     
     def generator(self):
-        '''generator function for producing documents
-           yields documents one by one
+        '''
+        generates and yields documents one by one
         '''
         for idx, src in enumerate(self.df):
             yield {
@@ -46,17 +50,19 @@ class Search:
             }
             
     def ingest_dataset(self):
-        '''Uses bulk API for ingesting documents in elasticsearch
-           consumed by start_indexing
-           returns result of the operation
+        '''
+        ingests documents using elasticsearch bulk api
+        (used for indexing)
+        returns ingested data
         '''
         from elasticsearch.helpers import bulk
         res = bulk(self.es, self.generator())
         return res
     
-    def start_indexing(self):
-        '''start indexing documents into elasticsearch
-           returns "success" otherwise error
+    def index_data(self):
+        '''
+        index documents into elasticsearch
+        returns "success" otherwise error
         '''
         try:
             self.ingest_dataset()
@@ -65,19 +71,22 @@ class Search:
             return str(e)
         
     def get_fields(self):
-        '''returns list of fields(columns) in dataset
-           
+        '''
+        returns the list of fields (columns) in the dataset    
         '''
         return list(self.es.indices.get_mapping(index=self.index)[self.index]['mappings']['properties'].keys())
 
     def is_ready(self):
-        '''returns True if index is present else False
+        '''
+        returns True if index is present else False
         '''
         return self.es.indices.exists(index=self.index)
         
     def body_generator(self, field:str, value:str, matchtype=None, size=None, src=None):
-        '''generates body for single pair - field:text
-           consumed by search engine
+        '''
+        generates the body comprising of field:value pairs
+        (used by find operation)
+        returns the body
         '''
         body = dict()
         if src:
@@ -92,26 +101,28 @@ class Search:
         return body
     
     def find(self, keywords:str):
-        '''returns list of hits for each field
-           consumed by process_result
+        '''
+        returns list of hits for each field
+        (used by process_result)
         '''
         result = []
         for field in self.get_fields():
-            b = self.body_generator(field=field,value=keywords, matchtype='match',size=self.es.count(index=self.index)['count'])
+            b = self.body_generator(field=field, value=keywords, matchtype='match', size=self.es.count(index=self.index)['count'])
             result.append(self.es.search(index=self.index,body=b))
         return result
     
     def process_result(self, res:list):
-        '''takes in result from find and processes
-           returns top results from found hits
+        '''
+        processes the result
+        returns top results
         '''
         documents = dict()
         for idx, field in enumerate(range(len(self.get_fields()))):
             for doc in range(res[field]['hits']['total']['value']):
                 documents[res[field]['hits']['hits'][doc]['_id']] = res[field]['hits']['hits'][doc]['_score']
-        sorted_responses = sorted(documents.items(),key=lambda x:x[1], reverse=True)
+        sorted_responses = sorted(documents.items(), key=lambda x:x[1], reverse=True)
         for idx, score in sorted_responses:
-            self.top_results.append(self.es.get(index=self.index,id=idx)['_source'])
+            self.top_results.append(self.es.get(index=self.index, id=idx)['_source'])
         return self.top_results
     
     def count_documents(self):
