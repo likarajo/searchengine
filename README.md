@@ -2,7 +2,7 @@
 
 A Search engine built using ElasticSearch and Python
 
-![]('app_screenshot.png')
+![](app_screenshot.png)
 
 ## Environment
 
