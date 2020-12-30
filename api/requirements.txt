@@ -1,0 +1,5 @@
+elasticsearch
+flask
+flask-cors
+python-dotenv
+pandas
